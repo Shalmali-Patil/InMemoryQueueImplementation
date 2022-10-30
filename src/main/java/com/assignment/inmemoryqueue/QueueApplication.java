@@ -1,7 +1,7 @@
-package com.assignment;
+package com.assignment.inmemoryqueue;
 
-import com.assignment.model.*;
-import com.assignment.service.QueueServiceImpl;
+import com.assignment.inmemoryqueue.model.*;
+import com.assignment.inmemoryqueue.service.QueueServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +19,16 @@ public class QueueApplication {
         prodThread.start();
         threads.add(prodThread);
 
-        Consumer consumer = new Consumer(queue, "200", null, "consume", "consumer1");
+        String twoHundredStatusPattern = ".*\\\"httpCode\\\":\\\"200\\\".*";
+        String fourHundredStatusPattern = ".*\\\"httpCode\\\":\\\"(?!200).*";
+        Consumer consumer = new Consumer(queue, twoHundredStatusPattern, null, "consume", "consumer1");
         List<Consumer> dependencies = new ArrayList<>();
-        Consumer1 consumer2 = new Consumer1(queue, "400",  null, "consume1", "consumer2");
+        Consumer1 consumer2 = new Consumer1(queue, fourHundredStatusPattern,  null, "consume1", "consumer2");
         dependencies.add(consumer2);
-        Consumer consumer3 = new Consumer(queue, "400",  dependencies, "consume", "consumer3");
-        queueServiceImpl.subscribe("400", consumer3);
-        queueServiceImpl.subscribe("400", consumer2);
-        queueServiceImpl.subscribe("200", consumer);
+        Consumer consumer3 = new Consumer(queue, fourHundredStatusPattern,  dependencies, "consume", "consumer3");
+        queueServiceImpl.subscribe(fourHundredStatusPattern, consumer3);
+        queueServiceImpl.subscribe(fourHundredStatusPattern, consumer2);
+        queueServiceImpl.subscribe(twoHundredStatusPattern, consumer);
 
         /*producer.stopProducing();
         consumer.stopConsuming();

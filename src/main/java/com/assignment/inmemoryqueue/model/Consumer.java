@@ -1,4 +1,4 @@
-package com.assignment.model;
+package com.assignment.inmemoryqueue.model;
 
 import java.util.List;
 
@@ -38,12 +38,7 @@ public class Consumer {
             //queueWrapper.notifyOnFull();
             if(m != null) {
                 System.out.println("m is: " + m.getMessageId() + ", pattern is:" + this.pattern);
-                if(m.getMessageId().contains(this.pattern)) {
-                    //m = queueWrapper.remove();
-                    System.out.println("Consumer: " + consumerId + " has consumed message with id: " + m.getMessageId() + ", thread name" + Thread.currentThread().getName());
-                } else {
-                    System.out.println("Consumer: " + consumerId + " did not match pattern "+this.pattern +" with message id: " + m.getMessageId() + ", thread name" + Thread.currentThread().getName());
-                }
+                System.out.println("CONSUMED!!!Consumer: " + getConsumerId() + " has consumed message with id: " + m.getMessageId() + ", thread name" + Thread.currentThread().getName());
             }
         try {
             Thread.sleep(10);

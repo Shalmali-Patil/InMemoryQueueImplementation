@@ -1,4 +1,4 @@
-package com.assignment.model;
+package com.assignment.inmemoryqueue.model;
 
 public class Queue {
 
@@ -14,7 +14,7 @@ public class Queue {
         this.capacity = capacity;
     }
 
-    private void addToQueue(Message message) {
+    private void addToQueue(String message) {
         Node newNode = new Node(message);
         if(head == null && tail == null) {
             head = newNode;
@@ -26,13 +26,13 @@ public class Queue {
         currSize++;
     }
 
-    private Message peekQueue() {
+    private String peekQueue() {
         if(head == null) {
             return null;
         }
         return head.getMessage();
     }
-    private Message getFromQueue() {
+    private String getFromQueue() {
         if(head == null) {
             return null;
         }
@@ -79,19 +79,19 @@ public class Queue {
     }
 
     class Node {
-        private Message message;
+        private String message;
         private Node prev;
         private Node next;
 
-        public Node(Message message) {
+        public Node(String message) {
             this.message = message;
         }
 
-        public Message getMessage() {
+        public String getMessage() {
             return message;
         }
 
-        public void setMessage(Message message) {
+        public void setMessage(String message) {
             this.message = message;
         }
 
@@ -112,19 +112,19 @@ public class Queue {
         }
     }
 
-    public void add(Message message) {
+    public void add(String message) {
         synchronized (this) {
             this.addToQueue(message);
         }
     }
 
-    public Message remove() {
+    public String remove() {
         synchronized (this) {
             return this.getFromQueue();
         }
     }
 
-    public Message peek() {
+    public String peek() {
         synchronized (this) {
             return this.peekQueue();
         }

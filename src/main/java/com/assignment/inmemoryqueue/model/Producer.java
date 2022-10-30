@@ -1,6 +1,9 @@
-package com.assignment.model;
+package com.assignment.inmemoryqueue.model;
 
-import com.assignment.service.QueueServiceImpl;
+import com.assignment.inmemoryqueue.service.QueueServiceImpl;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import java.io.IOException;
 
 public class Producer implements Runnable {
     private Queue queue;
@@ -12,11 +15,14 @@ public class Producer implements Runnable {
     private Queue deadQueue;
     private final String[] messages = new String[]{"200","400","400","200","200","400"};
 
+    private ObjectMapper objectMapper;
+
     public Producer(Queue queueWrapper, Queue deadQueue, QueueServiceImpl queueServiceImpl) {
         this.queue = queueWrapper;
         this.deadQueue = deadQueue;
         this.producerId = "" + Math.round(Math.random()*1000);
         this.queueServiceImpl = queueServiceImpl;
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
@@ -45,7 +51,13 @@ public class Producer implements Runnable {
                     /*if(!produceFlag) {
                         break;
                     }*/
-                    queue.add(message);
+                    String messageStr = null;
+                    try {
+                        messageStr = objectMapper.writeValueAsString(message);
+                    } catch (IOException e) {
+                        System.out.println("Error occurred while convering object to json string. Exception: " + e);
+                    }
+                    queue.add(messageStr);
                     //System.out.println("Producer: " + producerId + " has produced message with id: " + message.getMessageId() + ", thread name" + Thread.currentThread().getName());
                     System.out.printf("New message %s added to the queue, Queue size: %d\n", message.getContent(), queue.getCurrSize());
                     queue.notifyOnEmpty();
@@ -57,9 +69,14 @@ public class Producer implements Runnable {
                 }
             }
             if(message.getRetryCount() >= Message.MAX_RETRY_COUNT) {
-                //System.out.println("Adding message: " + message.getMessageId() + " to dead queue");
                 System.out.printf("Retries exhausted, moving messageId %s to sideline\n", message.getMessageId());
-                deadQueue.add(message);
+                String messageStr = null;
+                try {
+                    messageStr = objectMapper.writeValueAsString(message);
+                } catch (IOException ioException) {
+                    System.out.println("Error occurred while convering object to json string. Exception: " + ioException);
+                }
+                deadQueue.add(messageStr);
             } else {
                 // start consumer
                 Thread t = new Thread(queueServiceImpl);
@@ -75,9 +92,21 @@ public class Producer implements Runnable {
 
     private Message getRandomMessage() {
         int randomNumber = (int) ((Math.random() * (messages.length-1 - 0)) + 0);
-        return new Message(messages[randomNumber]);
+        String randomMessageId = getMessageId();
+        String randomHttpStatus = messages[randomNumber];
+        MessageContent content = new MessageContent(randomMessageId, randomHttpStatus);
+        return new Message(randomMessageId, content);
     }
 
+    private String getMessageId() {
+        String possibleChars = "abcdefghijklmnopqrstuvxyz";
+        StringBuffer sb = new StringBuffer();
+        for(int i=0;i<3;i++) {
+            int index = (int) (Math.random() * possibleChars.length());
+            sb.append(possibleChars.charAt(index));
+        }
+        return sb.toString();
+    }
     public void stopProducing() {
         this.produceFlag = false;
         queue.notifyOnFull();

@@ -1,18 +1,20 @@
-package com.assignment.model;
+package com.assignment.inmemoryqueue.model;
 
 public class Message {
     private String messageId;
-    private String content;
+    private MessageContent content;
     private long createdAt;
 
     private int retryCount = 0;
     public static final int MAX_RETRY_COUNT = 3;
 
-    public Message(String messageId) {
+    public Message(String messageId, MessageContent content) {
         this.messageId = messageId;
-        // TODO: replace with JSON content
-        this.content = messageId;
+        this.content = content;
         this.createdAt = System.currentTimeMillis();
+    }
+
+    public Message() {
     }
 
     public String getMessageId() {
@@ -23,11 +25,11 @@ public class Message {
         this.messageId = messageId;
     }
 
-    public String getContent() {
+    public MessageContent getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(MessageContent content) {
         this.content = content;
     }
 

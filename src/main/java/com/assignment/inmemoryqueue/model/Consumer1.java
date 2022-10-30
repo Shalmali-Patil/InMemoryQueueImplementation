@@ -1,4 +1,4 @@
-package com.assignment.model;
+package com.assignment.inmemoryqueue.model;
 
 import java.util.List;
 
@@ -12,11 +12,7 @@ public class Consumer1 extends Consumer {
         System.out.println("This is consume1 method");
         if(m != null) {
             System.out.println("m is: " + m.getMessageId() + ", pattern is:" + getPattern());
-            if(m.getMessageId().contains(getPattern())) {
-                System.out.println("CONSUMED!!!Consumer: " + getConsumerId() + " has consumed message with id: " + m.getMessageId() + ", thread name" + Thread.currentThread().getName());
-            } else {
-                System.out.println("Consumer: " + getConsumerId() + " did not match pattern "+ getPattern() +" with message id: " + m.getMessageId() + ", thread name" + Thread.currentThread().getName());
-            }
+            System.out.println("CONSUMED!!!Consumer: " + getConsumerId() + " has consumed message with id: " + m.getMessageId() + ", thread name" + Thread.currentThread().getName());
         }
         try {
             Thread.sleep(10);
